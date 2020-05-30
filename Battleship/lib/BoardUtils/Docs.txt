@@ -1,0 +1,95 @@
+
+Custom 8x8 LED Matrix Usage Library:
+
+----------------------------GLOBAL DEFINITIONS:-----------------------------
+
+Colors:
+Colors are represented as a three bit binary value:
+
+RED: 0b100
+BLUE: 0b010
+GREEN: 0b001
+
+All other color combinations are just bitwise or combinations of these three colors, the colors defined are:
+
+YELLOW: RED | GREEN
+PURPLE: BLUE | RED
+CYAN: GREEN | BLUE
+
+Pin Definitions:
+Pins are hard coded and hardware set to be 
+
+Serial Shift Register Data Pin (SD): Pin 12 (PB0)
+Serial Shift Register Clock Pin (SCLK): Pin 13 (PB1)
+Serial Shift Register Latch Clock (LCLK): Pin 14 (PB2)
+Serial Shift Register Not Output Enable (OE): Pin 15 (PB3)
+
+Serial Port Input (RX): Pin 0 (PA0)
+Serial Port Output (TX): Pin 1 (PA1)
+
+Potentiometer (POT): Pin A0 (PF1)
+User Input Button (BUTTON): Pin 16 (PB4)
+
+Rows and Columns:
+
+Number of Rows (ROWS): 8
+Number of Columns (COLS): 8
+
+Game Phases:
+
+Attack Phase (ATK): true
+Defense Phase (DEF): false
+
+Transmission Codes:
+
+Connecton Code (CONNECT): 0xcc
+Winning Message (YOUWIN): 0x88
+Losing Message (YOULOSE): 0x77 (~YOUWIN)
+
+
+---------------------------EXTERNAL LIBRARIES:-------------------------------------
+
+Arduino General Library for use on the ATMega 32u4 chip
+C standard library
+C standard boolean library
+Custom Bitmap Letter Library for Text Output on the grid
+
+---------------------------CUSTOM TYPES------------------------------------------
+
+Shift Register Data (SRDATA): 8 bits of red, blue, and green to represent a row on the board
+Full Board (BOARD): a collection of 8 SRDATAs to make a full 8x8 grid
+Coordinate Type (COORD): a byte to represent an x, y tuple, with the first three bits as y and the second three as the x
+Ship Type (SHIP): a collection of a COORD for the head and orientation and a byte for the length of the ship
+Game Mode Type (GAMEMODE): enum type to represent the gamemode { SETUP, GAME, END }
+Rotation Type (ROTATION): enum type to represent rotation { UP, DOWN, LEFT, RIGHT }
+Letter Type (LETTER): a structure made of 8 bytes to be printed to the screen, there are global constants for each symbol
+
+
+----------------------------GLOBAL CONSTANTS-------------------------------------
+
+Rainbow (RAINBOW): an array of all of the colors in rainbow order
+
+---------------------------FUNCTIONS:--------------------------------------------
+
+void initpins(void);   // initializes and configures the pins involved
+void tick(byte pin);   // quickly blinks a pin pin
+void writeRow(byte y, SRDATA* row);  // writes a SRDATA struct to the Grid on y position y
+void send(COORD data);  // sends data over serial, sends COORD data
+COORD receive(void);    // reads data from the other board and outputs it
+void drawDot(byte x, byte y, byte color);  // draws a dot on the board at (x,y) with color color
+void addBoardDot(BOARD* board, COORD coord, byte color); // adds a dot to a board at COORD coord with color color
+void writeSR(bool val);   // writes one bit into the Shift Register , the value of val
+bool cointoss();        // randomly produces a true or false and gives the other board the opposite
+COORD querypoint(BOARD* board);  // gets a point from the user using the potentiometer and the button
+void writebyteRow(byte row, byte y, byte color);  // writes a byte representing a row into the SR on row y with color color
+void writebyteBoard(byte* board, byte color);     // writes all rows of bytes representing a row
+void writeChar(LETTER* letter, byte color, byte time);  // writes a letter to a grid, printing a LETTER type
+void writeText(const char* string, byte* colorlist, byte numcolors, byte time); // writes a whole string of chars
+bool emptyspace(BOARD* board, byte xmin, byte xmax, byte ymin, byte ymax);  // returns whether or not there is anything in the rectangle
+bool SpotOccupied(BOARD* board, COORD coord);  // return whether or not a particular space has anything
+
+
+
+
+
+
